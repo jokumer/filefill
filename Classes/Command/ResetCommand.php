@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace IchHabRecht\Filefill\Command;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection as DBALConnection;
 use IchHabRecht\Filefill\Repository\FileRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ResetCommand extends AbstractCommand
 {
     /**
-     * @var \TYPO3\CMS\Core\Database\Connection
+     * @var Connection
      */
     protected $connection;
 
@@ -24,7 +25,7 @@ class ResetCommand extends AbstractCommand
      */
     protected $fileRepository;
 
-    public function __construct(string $name = null, Connection $connection = null, FileRepository $fileRepository = null)
+    public function __construct(string $name = null, DBALConnection $connection = null, FileRepository $fileRepository = null)
     {
         parent::__construct($name);
 
@@ -80,24 +81,24 @@ class ResetCommand extends AbstractCommand
                 ),
                 $expressionBuilder->eq(
                     'f.missing',
-                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)
                 )
             )
             ->groupBy('f.storage')
             ->orderBy('f.storage')
-            ->execute();
+            ->executeQuery();
 
-        while ($row = $statement->fetch()) {
+        while ($row = $statement->fetchAssociative()) {
             $updateQueryBuilder = $this->connection->createQueryBuilder();
             $updateQueryBuilder->update('sys_file')
                 ->where(
                     $updateQueryBuilder->expr()->eq(
                         'storage',
-                        $updateQueryBuilder->createNamedParameter($row['storage'], \PDO::PARAM_INT)
+                        $updateQueryBuilder->createNamedParameter($row['storage'], Connection::PARAM_INT)
                     )
                 )
-                ->set('missing', 0, true, \PDO::PARAM_INT)
-                ->execute();
+                ->set('missing', 0, true, Connection::PARAM_INT)
+                ->executeQuery();
             $output->writeln(sprintf(
                 'Reset %d file(s) in storage "%s" (uid: %d)',
                 $row['count'],

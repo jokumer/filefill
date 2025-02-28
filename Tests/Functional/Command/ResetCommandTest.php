@@ -49,7 +49,7 @@ class ResetCommandTest extends AbstractFunctionalTestCase
         $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('sys_file');
         $rows = $queryBuilder->update('sys_file')
             ->set('missing', 1)
-            ->execute();
+            ->executeQuery();
         $this->assertNotEmpty($rows);
     }
 
@@ -81,8 +81,8 @@ class ResetCommandTest extends AbstractFunctionalTestCase
                     $queryBuilder->createNamedParameter(1)
                 )
             )
-            ->execute()
-            ->fetchOne();
+            ->executeQuery()
+            ->fetchOneAssociative();
         $this->assertEmpty($rows);
 
         $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('sys_file');
@@ -98,8 +98,8 @@ class ResetCommandTest extends AbstractFunctionalTestCase
                     $queryBuilder->createNamedParameter(2)
                 )
             )
-            ->execute()
-            ->fetchOne();
+            ->executeQuery()
+            ->fetchOneAssociative();
         $this->assertNotEmpty($rows);
     }
 
@@ -124,8 +124,8 @@ class ResetCommandTest extends AbstractFunctionalTestCase
                     $queryBuilder->createNamedParameter(1)
                 )
             )
-            ->execute()
-            ->fetchOne();
+            ->executeQuery()
+            ->fetchOneAssociative();
         $this->assertEmpty($rows);
     }
 }

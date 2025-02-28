@@ -20,6 +20,7 @@ namespace IchHabRecht\Filefill\Form\Element;
 use Doctrine\DBAL\FetchMode;
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -36,21 +37,18 @@ class ShowMissingFiles extends AbstractFormElement
     /**
      * Container objects give $nodeFactory down to other containers.
      *
-     * @param NodeFactory $nodeFactory
-     * @param array $data
      * @param LanguageService|null $languageService
      * @throws \InvalidArgumentException
      */
-    public function __construct(NodeFactory $nodeFactory, array $data, $languageService = null)
+    public function __construct($languageService = null)
     {
-        parent::__construct($nodeFactory, $data);
         $this->languageService = $languageService ?: $GLOBALS['LANG'];
     }
 
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
 
@@ -61,15 +59,15 @@ class ShowMissingFiles extends AbstractFormElement
             ->where(
                 $expressionBuilder->eq(
                     'storage',
-                    $queryBuilder->createNamedParameter($this->data['vanillaUid'], \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->data['vanillaUid'], Connection::PARAM_INT)
                 ),
                 $expressionBuilder->eq(
                     'missing',
-                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)
                 )
             )
-            ->execute()
-            ->fetch(FetchMode::NUMERIC)[0] ?? 0;
+            ->executeQuery()
+            ->fetchNumeric()[0] ?? 0;
 
         $html = [];
         $html[] = '<div class="form-control-wrap">';

@@ -49,8 +49,8 @@ class DeleteCommandTest extends AbstractFunctionalTestCase
         $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('sys_file');
         $rows = $queryBuilder->select('*')
             ->from('sys_file')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
         foreach ($rows as $row) {
             $file = $this->resourceFactory->getFileObject($row['uid']);
             $this->assertNotEmpty($file->getContents());
@@ -78,8 +78,8 @@ class DeleteCommandTest extends AbstractFunctionalTestCase
                 'tx_filefill_identifier',
                 $queryBuilder->createNamedParameter('placeholder')
             ))
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
         $this->assertEmpty($rows);
     }
 

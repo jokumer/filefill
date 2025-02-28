@@ -22,6 +22,7 @@ use IchHabRecht\Filefill\Exception\UnknownResourceException;
 use IchHabRecht\Filefill\Repository\FileRepository;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -181,15 +182,15 @@ class RemoteResourceCollection implements LoggerAwareInterface
                 ->where(
                     $expressionBuilder->eq(
                         'storage',
-                        $queryBuilder->createNamedParameter((int)$storage->getUid(), \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter((int)$storage->getUid(), Connection::PARAM_INT)
                     ),
                     $expressionBuilder->eq(
                         'identifier',
-                        $queryBuilder->createNamedParameter($fileIdentifier, \PDO::PARAM_STR)
+                        $queryBuilder->createNamedParameter($fileIdentifier)
                     )
                 )
-                ->execute()
-                ->fetch(\PDO::FETCH_ASSOC);
+                ->executeQuery()
+                ->fetchAssociative();
             if (empty($databaseRow)) {
                 return null;
             }

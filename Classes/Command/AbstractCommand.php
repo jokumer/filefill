@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace IchHabRecht\Filefill\Command;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection as DBALConnection;
 use Symfony\Component\Console\Command\Command;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -23,7 +24,7 @@ abstract class AbstractCommand extends Command
                 $expressionBuilder->orX(
                     $expressionBuilder->eq(
                         'tx_filefill_enable',
-                        $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)
                     ),
                     $expressionBuilder->in(
                         'uid',
@@ -32,8 +33,8 @@ abstract class AbstractCommand extends Command
                 )
             )
             ->orderBy('uid')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         return array_combine(array_map('intval', array_column($rows, 'uid')), $rows);
     }

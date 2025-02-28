@@ -40,14 +40,11 @@ class ShowDeleteFiles extends AbstractFormElement
     /**
      * Container objects give $nodeFactory down to other containers.
      *
-     * @param NodeFactory $nodeFactory
-     * @param array $data
      * @param FileRepository|null $fileRepository
      * @param LanguageService|null $languageService
      */
-    public function __construct(NodeFactory $nodeFactory, array $data, FileRepository $fileRepository = null, $languageService = null)
+    public function __construct(FileRepository $fileRepository = null, $languageService = null)
     {
-        parent::__construct($nodeFactory, $data);
         $this->fileRepository = $fileRepository ?: GeneralUtility::makeInstance(FileRepository::class);
         $this->languageService = $languageService ?: $GLOBALS['LANG'];
     }
@@ -55,7 +52,7 @@ class ShowDeleteFiles extends AbstractFormElement
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
 
